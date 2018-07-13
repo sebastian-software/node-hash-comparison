@@ -59,7 +59,7 @@ const results = [
     ]
 ]
 
-for (let i = 5; i <= 25; i+=3) {
+for (let i = 8; i <= 25; i+=3) {
     const buffer = crypto.randomBytes(Math.pow(2, i))
 
     const suite = new benchmark.Suite()
