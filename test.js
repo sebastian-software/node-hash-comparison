@@ -38,6 +38,7 @@ const farmhash = require("farmhash")
 const metrohash = require("metrohash")
 const murmurhashNative = require("murmurhash-native")
 const xxhash = require("xxhash")
+const crc32 = require("sse4_crc32")
 
 const results = [
     [
@@ -46,6 +47,7 @@ const results = [
         "sha1",
         "farmHash-hash64",
         // "farmHash-fingerprint64",
+        "crc32",
         "xxHash-32",
         "xxHash-64",
         "metroHash-64",
@@ -85,6 +87,10 @@ for (let i = 8; i <= 25; i+=3) {
     // suite.add("farmHash-fingerprint64", () => {
     //     farmhash.fingerprint64(buffer)
     // })
+
+    suite.add("crc32", (buffer) => {
+        crc32.calculate(buffer)
+    })
 
     suite.add("metroHash-64", () => {
         metrohash.metrohash64(buffer)

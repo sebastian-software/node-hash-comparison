@@ -15,6 +15,7 @@
     "farmhash": "^2.1.0",
     "metrohash": "^2.4.1",
     "murmurhash-native": "^3.2.3",
+    "sse4_crc32": "^5.2.0",
     "xxhash": "^0.2.4"
   }
 }
