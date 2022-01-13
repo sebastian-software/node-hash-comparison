@@ -24,44 +24,19 @@
 
 "use strict"
 
-const start = new Date().getTime()
-
-global.__base = __dirname + "/"
-
 const crypto = require("crypto")
 const fs = require("fs")
 const path = require("path")
 
 const benchmark = require("benchmark")
 const beautifyBenchmark = require("beautify-benchmark")
+
 const farmhash = require("farmhash")
-const metrohash = require("metrohash")
 const murmurhashNative = require("murmurhash-native")
 const xxhash = require("xxhash")
-const crc32 = require("sse4_crc32")
+const wasm = require("hash-wasm")
 
-const results = [
-    [
-        "Data size",
-        "md5",
-        "sha1",
-        "farmHash-hash64",
-        // "farmHash-fingerprint64",
-        "crc32",
-        "xxHash-32",
-        "xxHash-64",
-        "metroHash-64",
-        "metroHash-128",
-        "murmurHash-64",
-        // "murmurHash-64x86",
-        // "murmurHash-64x64",
-        "murmurHash-128",
-        // "murmurHash-128x86",
-        // "murmurHash-128x64"
-    ]
-]
-
-for (let i = 8; i <= 25; i+=3) {
+for (let i = 5; i <= 17; i+=3) {
     const buffer = crypto.randomBytes(Math.pow(2, i))
 
     const suite = new benchmark.Suite()
@@ -80,76 +55,46 @@ for (let i = 8; i <= 25; i+=3) {
             .digest("hex")
     })
 
-    suite.add("farmHash-hash64", () => {
+    suite.add("farmHash64", () => {
         farmhash.hash64(buffer)
     })
 
-    // suite.add("farmHash-fingerprint64", () => {
-    //     farmhash.fingerprint64(buffer)
-    // })
-
-    suite.add("crc32", (buffer) => {
-        crc32.calculate(buffer)
-    })
-
-    suite.add("metroHash-64", () => {
-        metrohash.metrohash64(buffer)
-    })
-
-    suite.add("metroHash-128", () => {
-        metrohash.metrohash128(buffer)
-    })
-
-    suite.add("murmurHash-64", () => {
+    suite.add("murmurHash64", () => {
         murmurhashNative.murmurHash64(buffer)
     })
 
-    // suite.add("murmurHash-64x86", () => {
-    //     murmurhashNative.murmurHash64x86(buffer)
-    // })
-
-    // suite.add("murmurHash-64x64", () => {
-    //     murmurhashNative.murmurHash64x64(buffer)
-    // })
-
-    suite.add("murmurHash-128", () => {
+    suite.add("murmurHash128", () => {
         murmurhashNative.murmurHash128(buffer)
     })
 
-    // suite.add("murmurHash-128x86", () => {
-    //     murmurhashNative.murmurHash128x86(buffer)
-    // })
-
-    // suite.add("murmurHash-128x64", () => {
-    //     murmurhashNative.murmurHash128x64(buffer)
-    // })
-
-    suite.add("xxHash-32", () => {
+    suite.add("xxHash32", () => {
         xxhash.hash(buffer, 0xCAFEBABE, "hex")
     })
 
-    suite.add("xxHash-64", () => {
+    suite.add("xxHash64", () => {
         xxhash.hash64(buffer, 0xCAFEBABE, "hex")
     })
 
-    const result = []
+    // suite.add("Wasm-XXhash64", () => {
+    //     return wasm.xxhash64(buffer)
+    // })
+
+    // suite.add("Wasm-XXhash128", () => {
+    //     return wasm.xxhash128(buffer)
+    // })
+
+    // suite.add("Wasm-XXhash3", () => {
+    //     return wasm.xxhash3(buffer)
+    // })
 
     suite
         .on("start", () => {
-            result[0] = buffer.length
-
-            console.log(`${result[0]} bytes`)
+            console.log(`${buffer.length} bytes`)
         })
         .on("cycle", (event) => {
-            const index = results[0].indexOf(event.target.name)
-
-            result[index] = event.target.hz
-
             beautifyBenchmark.add(event.target)
         })
         .on("complete", () => {
-            results.push(result.join(","))
-
             beautifyBenchmark.log()
 
             console.log("Fastest is: " + suite.filter("fastest")[0].name)
@@ -157,13 +102,3 @@ for (let i = 8; i <= 25; i+=3) {
         })
         .run({async: false})
 }
-
-results[0] = results[0].join(",")
-
-fs.writeFile(`${__base}csv/hash_performance.csv`, results.join("\n"), (err) => {
-    if (err) {
-        throw err
-    } else {
-        console.log(`\n${path.basename(__filename)} finished in ${(new Date().getTime() - start)} ms.`)
-    }
-})
