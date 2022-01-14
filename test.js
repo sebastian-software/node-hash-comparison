@@ -70,23 +70,23 @@ function run(callback, expo) {
             .digest()
     })
 
-    suite.add("Blake3 :: #32", () => {
+    suite.add("Blake3-WASM :: #32", () => {
         blake3.hash(buffer)
     })
 
-    suite.add("farmHash :: #32", () => {
+    suite.add("FarmHash-Native :: #32", () => {
         farmhash.hash32(buffer)
     })
 
-    suite.add("farmHash :: FP #32", () => {
+    suite.add("FarmHash-Native :: FP #32", () => {
         farmhash.fingerprint32(buffer)
     })
 
-    suite.add("farmHash :: #64", () => {
+    suite.add("FarmHash-Native :: #64", () => {
         farmhash.hash64(buffer)
     })
 
-    suite.add("farmHash :: FP #64", () => {
+    suite.add("FarmHash-Native :: FP #64", () => {
         farmhash.fingerprint64(buffer)
     })
 
@@ -197,7 +197,7 @@ async function main() {
 
     console.log("Starting benchmark...")
     await asyncRun(4)
-    // await asyncRun(10)
+    await asyncRun(10)
 }
 
 main()
