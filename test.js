@@ -36,8 +36,8 @@ const murmurhashNative = require("murmurhash-native")
 const xxhash = require("xxhash")
 const wasm = require("hash-wasm")
 
-for (let i = 8; i <= 16; i+=6) {
-    const buffer = crypto.randomBytes(Math.pow(2, i))
+function run(expo) {
+    const buffer = crypto.randomBytes(Math.pow(2, expo))
 
     const suite = new benchmark.Suite()
 
@@ -95,13 +95,13 @@ for (let i = 8; i <= 16; i+=6) {
         }
     })
 
-    // suite.add("Wasm-XXhash128", () => {
-    //     return wasm.xxhash128(buffer)
-    // })
+    suite.add("Wasm-XXhash128", () => {
+        return wasm.xxhash128(buffer)
+    })
 
-    // suite.add("Wasm-XXhash3", () => {
-    //     return wasm.xxhash3(buffer)
-    // })
+    suite.add("Wasm-XXhash3", () => {
+        return wasm.xxhash3(buffer)
+    })
 
     suite
         .on("start", () => {
@@ -116,5 +116,7 @@ for (let i = 8; i <= 16; i+=6) {
             console.log("Fastest is: " + suite.filter("fastest")[0].name)
             console.log("Slowest is: " + suite.filter("slowest")[0].name)
         })
-        .run({async: false})
+        .run({async: true})
 }
+
+run(8)
