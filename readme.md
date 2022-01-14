@@ -29,7 +29,7 @@ Excluded native bindings (not well maintained):
 
 ## Summary
 
-- Small files/content: XXHash WASM is the winner
-- Big files/content: Farmhash Native 64 is the winner
+- Small files/content: [XXHash WASM](https://github.com/jungomi/xxhash-wasm) is the winner
+- Big files/content: [Farmhash Native 64](https://github.com/lovell/farmhash) is the winner
 
 What's nice is that XXHash WASM is so fast in most cases that going natively is only beneficial for quite large files. For most common hashing needs XXHash WASM looks like a easy to use and high performance cross-platform solution.
