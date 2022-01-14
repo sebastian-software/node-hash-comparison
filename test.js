@@ -36,7 +36,13 @@ const murmurhashNative = require("murmurhash-native")
 const xxhash = require("xxhash")
 const wasm = require("hash-wasm")
 
-function run(expo) {
+function promisify(callback) {
+    return (...args) => new Promise(function(resolve, reject) {
+        callback(resolve, ...args)
+    })
+}
+
+function run(callback, expo) {
     const buffer = crypto.randomBytes(Math.pow(2, expo))
 
     const suite = new benchmark.Suite()
@@ -115,8 +121,17 @@ function run(expo) {
 
             console.log("Fastest is: " + suite.filter("fastest")[0].name)
             console.log("Slowest is: " + suite.filter("slowest")[0].name)
+
+            callback();
         })
         .run({async: true})
 }
 
-run(8)
+const asyncRun = promisify(run)
+
+async function main() {
+    await asyncRun(2)
+    await asyncRun(10)
+}
+
+main()
