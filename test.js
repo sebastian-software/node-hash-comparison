@@ -36,7 +36,7 @@ const murmurhashNative = require("murmurhash-native")
 const xxhash = require("xxhash")
 const wasm = require("hash-wasm")
 
-for (let i = 5; i <= 17; i+=3) {
+for (let i = 5; i <= 14; i+=3) {
     const buffer = crypto.randomBytes(Math.pow(2, i))
 
     const suite = new benchmark.Suite()
