@@ -115,7 +115,7 @@ function run(callback, expo) {
     })
 
     suite.add("xxHash-WASM :: #64", () => {
-        xxhashWasmInstance.h32Raw(buffer)
+        xxhashWasmInstance.h64Raw(buffer)
     })
 
     suite.add("WASM-Lib :: Blake3 #32", {
@@ -198,6 +198,7 @@ async function main() {
     console.log("Starting benchmark...")
     await asyncRun(4)
     await asyncRun(10)
+    await asyncRun(16)
 }
 
 main()
