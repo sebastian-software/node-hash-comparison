@@ -36,7 +36,7 @@ const murmurhashNative = require("murmurhash-native")
 const xxhash = require("xxhash")
 const wasm = require("hash-wasm")
 
-for (let i = 8; i <= 14; i+=6) {
+for (let i = 8; i <= 16; i+=6) {
     const buffer = crypto.randomBytes(Math.pow(2, i))
 
     const suite = new benchmark.Suite()
@@ -55,8 +55,20 @@ for (let i = 8; i <= 14; i+=6) {
             .digest("hex")
     })
 
-    suite.add("farmHash64", () => {
+    suite.add("farmHash.hash32", () => {
+        farmhash.hash32(buffer)
+    })
+
+    suite.add("farmHash.fingerprint32", () => {
+        farmhash.fingerprint32(buffer)
+    })
+
+    suite.add("farmHash.hash64", () => {
         farmhash.hash64(buffer)
+    })
+
+    suite.add("farmHash.fingerprint64", () => {
+        farmhash.fingerprint64(buffer)
     })
 
     suite.add("murmurHash64", () => {
@@ -75,9 +87,13 @@ for (let i = 8; i <= 14; i+=6) {
         xxhash.hash64(buffer, 0xCAFEBABE, "hex")
     })
 
-    // suite.add("Wasm-XXhash64", () => {
-    //     return wasm.xxhash64(buffer)
-    // })
+    suite.add("Wasm-XXhash64", {
+        defer: true,
+        fn: async(deferred) => {
+            await wasm.xxhash64(buffer)
+            deferred.resolve()
+        }
+    })
 
     // suite.add("Wasm-XXhash128", () => {
     //     return wasm.xxhash128(buffer)
