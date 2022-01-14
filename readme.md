@@ -1,4 +1,4 @@
-# Comparison of different hash algorithms
+# Performance comparison of different hash algorithms
 
 Based on the code from [this Medium post](https://medium.com/@drainingsun/in-search-of-a-good-node-js-hashing-algorithm-8052b6923a3b)
 
@@ -17,10 +17,19 @@ Excluded native bindings (not well maintained):
 
 - Metrohash (not supported on ARM/M1)
 
-## iMac 5K 2014 4Ghz i7
+## Results
+
+### iMac 5K 2014 4Ghz i7 (X64)
 
 ![imac results](measured-on-imac-5k-2014-4ghz-i7.png)
 
-## MacBook Pro 2016 2.7 Ghz i7
+### MacBook Pro 2021 M1 Pro (ARM)
 
-![macbook results](measured-on-macbook-pro-2016-2.7ghz-i7.png)
+![macbook results](measured-on-macbook-pro-2021.png)
+
+## Summary
+
+- Small files/content: XXHash WASM is the winner
+- Big files/content: Farmhash Native 64 is the winner
+
+What's nice is that XXHash WASM is so fast in most cases that going natively is only beneficial for quite large files. For most common hashing needs XXHash WASM looks like a easy to use and high performance cross-platform solution.
