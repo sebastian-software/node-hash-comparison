@@ -32,9 +32,11 @@ const benchmark = require("benchmark")
 const beautifyBenchmark = require("beautify-benchmark")
 
 const farmhash = require("farmhash")
-const murmurhashNative = require("murmurhash-native")
-const xxhash = require("xxhash")
+const murmurhash_native = require("murmurhash-native")
+const xxhash_native = require("xxhash")
+const xxhash_wasm = require("xxhash-wasm")
 const wasm = require("hash-wasm")
+const blake3 = require("blake3")
 
 function promisify(callback) {
     return (...args) => new Promise(function(resolve, reject) {
@@ -47,53 +49,92 @@ function run(callback, expo) {
 
     const suite = new benchmark.Suite()
 
-    suite.add("md5", () => {
+    suite.add("Node Crypto :: md5", () => {
         crypto
             .createHash("md5")
             .update(buffer)
-            .digest("hex")
+            .digest()
     })
 
-    suite.add("sha1", () => {
+    suite.add("Node Crypto :: sha1", () => {
         crypto
             .createHash("sha1")
             .update(buffer)
-            .digest("hex")
+            .digest()
     })
 
-    suite.add("farmHash.hash32", () => {
+    suite.add("Node Crypto :: sha512", () => {
+        crypto
+            .createHash("sha512")
+            .update(buffer)
+            .digest()
+    })
+
+    suite.add("Blake3 :: #32", () => {
+        blake3.hash(buffer)
+    })
+
+    suite.add("farmHash :: #32", () => {
         farmhash.hash32(buffer)
     })
 
-    suite.add("farmHash.fingerprint32", () => {
+    suite.add("farmHash :: FP #32", () => {
         farmhash.fingerprint32(buffer)
     })
 
-    suite.add("farmHash.hash64", () => {
+    suite.add("farmHash :: #64", () => {
         farmhash.hash64(buffer)
     })
 
-    suite.add("farmHash.fingerprint64", () => {
+    suite.add("farmHash :: FP #64", () => {
         farmhash.fingerprint64(buffer)
     })
 
-    suite.add("murmurHash64", () => {
-        murmurhashNative.murmurHash64(buffer)
+    suite.add("murmurHash-Native :: #32", () => {
+        murmurhash_native.murmurHash32(buffer)
     })
 
-    suite.add("murmurHash128", () => {
-        murmurhashNative.murmurHash128(buffer)
+    suite.add("murmurHash-Native :: #64", () => {
+        murmurhash_native.murmurHash64(buffer)
     })
 
-    suite.add("xxHash32", () => {
-        xxhash.hash(buffer, 0xCAFEBABE, "hex")
+    suite.add("murmurHash-Native :: #128", () => {
+        murmurhash_native.murmurHash128(buffer)
     })
 
-    suite.add("xxHash64", () => {
-        xxhash.hash64(buffer, 0xCAFEBABE, "hex")
+    suite.add("xxHash-Native #32", () => {
+        xxhash_native.hash(buffer, 0xCAFEBABE)
     })
 
-    suite.add("Wasm-XXhash64", {
+    suite.add("xxHash-Native #64", () => {
+        xxhash_native.hash64(buffer, 0xCAFEBABE)
+    })
+
+    suite.add("xxHash-WASM :: #32", () => {
+        xxhashWasmInstance.h32Raw(buffer)
+    })
+
+    suite.add("xxHash-WASM :: #64", () => {
+        xxhashWasmInstance.h32Raw(buffer)
+    })
+
+    suite.add("WASM-Lib :: Blake3 #32", {
+        defer: true,
+        fn: async(deferred) => {
+            await wasm.blake3(buffer)
+            deferred.resolve()
+        }
+    })
+
+    suite.add("WASM-Lib :: XXhash #32", {
+        defer: true,
+        fn: async(deferred) => {
+            await wasm.xxhash32(buffer)
+            deferred.resolve()
+        }
+    })
+
+    suite.add("WASM-Lib :: XXhash #64", {
         defer: true,
         fn: async(deferred) => {
             await wasm.xxhash64(buffer)
@@ -101,12 +142,20 @@ function run(callback, expo) {
         }
     })
 
-    suite.add("Wasm-XXhash128", () => {
-        return wasm.xxhash128(buffer)
+    suite.add("WASM-Lib :: Wasm-XXhash #128", {
+        defer: true,
+        fn: async(deferred) => {
+            await wasm.xxhash128(buffer)
+            deferred.resolve()
+        }
     })
 
-    suite.add("Wasm-XXhash3", () => {
-        return wasm.xxhash3(buffer)
+    suite.add("WASM-Lib :: XXhash3 #??", {
+        defer: true,
+        fn: async(deferred) => {
+            await wasm.xxhash3(buffer)
+            deferred.resolve()
+        }
     })
 
     suite
@@ -129,9 +178,26 @@ function run(callback, expo) {
 
 const asyncRun = promisify(run)
 
+let xxhashWasmInstance
+
 async function main() {
-    await asyncRun(2)
-    await asyncRun(10)
+    console.log("Preparing XXHash-Wasm...")
+    // Pre-boot WASM for XXHash
+    xxhashWasmInstance = await xxhash_wasm();
+
+    console.log("Preparing WASM-Hash...")
+    // Pre-initialize shorthand methods in WASM-Hash
+    // From docs: "shorthand functions like md5() reuse the same WASM instance and state to do multiple calculations"
+    const testBuffer = crypto.randomBytes(Math.pow(2, 6))
+    await wasm.blake3(testBuffer)
+    await wasm.xxhash32(testBuffer)
+    await wasm.xxhash64(testBuffer)
+    await wasm.xxhash128(testBuffer)
+    await wasm.xxhash3(testBuffer)
+
+    console.log("Starting benchmark...")
+    await asyncRun(4)
+    // await asyncRun(10)
 }
 
 main()

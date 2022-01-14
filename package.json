@@ -12,9 +12,11 @@
   "dependencies": {
     "beautify-benchmark": "^0.2.4",
     "benchmark": "^2.1.4",
+    "blake3": "^2.1.7",
     "farmhash": "^3.2.2",
     "hash-wasm": "^4.9.0",
     "murmurhash-native": "^3.5.0",
-    "xxhash": "^0.3.0"
+    "xxhash": "^0.3.0",
+    "xxhash-wasm": "^0.4.2"
   }
 }
