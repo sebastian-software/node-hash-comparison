@@ -63,12 +63,12 @@ function run(callback, expo) {
             .digest()
     })
 
-    suite.add("Node Crypto :: sha512", () => {
-        crypto
-            .createHash("sha512")
-            .update(buffer)
-            .digest()
-    })
+    // suite.add("Node Crypto :: sha512", () => {
+    //     crypto
+    //         .createHash("sha512")
+    //         .update(buffer)
+    //         .digest()
+    // })
 
     suite.add("Blake3-WASM :: #32", () => {
         blake3.hash(buffer)
@@ -78,17 +78,17 @@ function run(callback, expo) {
         farmhash.hash32(buffer)
     })
 
-    suite.add("FarmHash-Native :: FP #32", () => {
-        farmhash.fingerprint32(buffer)
-    })
+    // suite.add("FarmHash-Native :: FP #32", () => {
+    //     farmhash.fingerprint32(buffer)
+    // })
 
     suite.add("FarmHash-Native :: #64", () => {
         farmhash.hash64(buffer)
     })
 
-    suite.add("FarmHash-Native :: FP #64", () => {
-        farmhash.fingerprint64(buffer)
-    })
+    // suite.add("FarmHash-Native :: FP #64", () => {
+    //     farmhash.fingerprint64(buffer)
+    // })
 
     suite.add("murmurHash-Native :: #32", () => {
         murmurhash_native.murmurHash32(buffer)
@@ -98,9 +98,9 @@ function run(callback, expo) {
         murmurhash_native.murmurHash64(buffer)
     })
 
-    suite.add("murmurHash-Native :: #128", () => {
-        murmurhash_native.murmurHash128(buffer)
-    })
+    // suite.add("murmurHash-Native :: #128", () => {
+    //     murmurhash_native.murmurHash128(buffer)
+    // })
 
     suite.add("xxHash-Native #32", () => {
         xxhash_native.hash(buffer, 0xCAFEBABE)
@@ -142,24 +142,25 @@ function run(callback, expo) {
         }
     })
 
-    suite.add("WASM-Lib :: Wasm-XXhash #128", {
-        defer: true,
-        fn: async(deferred) => {
-            await wasm.xxhash128(buffer)
-            deferred.resolve()
-        }
-    })
+    // suite.add("WASM-Lib :: XXhash #128", {
+    //     defer: true,
+    //     fn: async(deferred) => {
+    //         await wasm.xxhash128(buffer)
+    //         deferred.resolve()
+    //     }
+    // })
 
-    suite.add("WASM-Lib :: XXhash3 #??", {
-        defer: true,
-        fn: async(deferred) => {
-            await wasm.xxhash3(buffer)
-            deferred.resolve()
-        }
-    })
+    // suite.add("WASM-Lib :: XXhash3 #??", {
+    //     defer: true,
+    //     fn: async(deferred) => {
+    //         await wasm.xxhash3(buffer)
+    //         deferred.resolve()
+    //     }
+    // })
 
     suite
         .on("start", () => {
+            console.log("")
             console.log(`${buffer.length} bytes`)
         })
         .on("cycle", (event) => {
@@ -196,8 +197,8 @@ async function main() {
     await wasm.xxhash3(testBuffer)
 
     console.log("Starting benchmark...")
-    // await asyncRun(4)
-    // await asyncRun(10)
+    await asyncRun(4)
+    await asyncRun(10)
     await asyncRun(16)
     await asyncRun(22)
 }
