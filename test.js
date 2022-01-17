@@ -197,10 +197,11 @@ async function main() {
     await wasm.xxhash3(testBuffer)
 
     console.log("Starting benchmark...")
-    await asyncRun(4)
+    //await asyncRun(6)
     await asyncRun(10)
-    await asyncRun(16)
-    await asyncRun(22)
+    // await asyncRun(14)
+    // await asyncRun(18)
+    await asyncRun(20)
 }
 
 main()
