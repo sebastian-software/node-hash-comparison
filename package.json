@@ -17,6 +17,6 @@
     "hash-wasm": "^4.9.0",
     "murmurhash-native": "^3.5.0",
     "xxhash": "^0.3.0",
-    "xxhash-wasm": "^0.4.2"
+    "xxhash-wasm": "^1.0.0"
   }
 }
